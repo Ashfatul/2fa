@@ -337,6 +337,12 @@
             animation: slideUp 0.3s ease-out;
         }
 
+        .modal .modal-body{
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
         @keyframes slideUp {
             from {
                 opacity: 0;
@@ -461,6 +467,18 @@
         .otp-list {
             display: grid;
             gap: 1rem;
+        }
+
+        div#otpContainer {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
+        @media (max-width: 500px){
+            div#otpContainer {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
         }
 
         .otp-item {
@@ -702,6 +720,33 @@
         .justify-center {
             justify-content: center;
         }
+
+        input::placeholder{
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* scroll bar */
+
+        /* width */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
 <body>
@@ -728,7 +773,7 @@
         <div class="header">
             <div class="header-title">
                 <div class="header-icon">2FA</div>
-                <span>My2FA Codes</span>
+                <span>My2FA</span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-icon btn-secondary" onclick="app.openSettings()" title="Settings">⚙️</button>
@@ -751,38 +796,40 @@
                 <button class="modal-close" onclick="app.closeModal('addCodeModal')">✕</button>
             </div>
             <form onsubmit="app.addCode(event)">
-                <div class="form-group">
-                    <label class="form-label">Service Name *</label>
-                    <input type="text" class="form-input" id="serviceName" placeholder="e.g., Gmail, GitHub" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Account/Email *</label>
-                    <input type="text" class="form-input" id="accountName" placeholder="e.g., user@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Secret Key (Base32) *</label>
-                    <input type="text" class="form-input" id="secretKey" placeholder="Paste your secret key here" required>
-                    <small style="color: var(--text-tertiary); margin-top: 0.25rem;">Usually found in QR code settings</small>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Algorithm</label>
-                    <select class="form-select" id="algorithm">
-                        <option value="SHA1">SHA1 (Default)</option>
-                        <option value="SHA256">SHA256</option>
-                        <option value="SHA512">SHA512</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Digits</label>
-                    <select class="form-select" id="digits">
-                        <option value="6">6 digits</option>
-                        <option value="7">7 digits</option>
-                        <option value="8">8 digits</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Time Step (seconds)</label>
-                    <input type="number" class="form-input" id="timeStep" value="30" min="1">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Service Name *</label>
+                        <input type="text" class="form-input" id="serviceName" placeholder="e.g., Gmail, GitHub" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Account/Email *</label>
+                        <input type="text" class="form-input" id="accountName" placeholder="e.g., user@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Secret Key (Base32) *</label>
+                        <input type="text" class="form-input" id="secretKey" placeholder="Paste your secret key here" required>
+                        <small style="color: var(--text-tertiary); margin-top: 0.25rem;">Usually found in QR code settings</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Algorithm</label>
+                        <select class="form-select" id="algorithm">
+                            <option value="SHA1">SHA1 (Default)</option>
+                            <option value="SHA256">SHA256</option>
+                            <option value="SHA512">SHA512</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Digits</label>
+                        <select class="form-select" id="digits">
+                            <option value="6">6 digits</option>
+                            <option value="7">7 digits</option>
+                            <option value="8">8 digits</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time Step (seconds)</label>
+                        <input type="number" class="form-input" id="timeStep" value="30" min="1">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="app.closeModal('addCodeModal')">Cancel</button>
@@ -849,14 +896,16 @@
                 <button class="modal-close" onclick="app.closeModal('editCodeModal')">✕</button>
             </div>
             <form onsubmit="app.updateCode(event)">
-                <input type="hidden" id="editCodeId">
-                <div class="form-group">
-                    <label class="form-label">Service Name</label>
-                    <input type="text" class="form-input" id="editServiceName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Account/Email</label>
-                    <input type="text" class="form-input" id="editAccountName" required>
+                <div class="modal-body">
+                    <input type="hidden" id="editCodeId">
+                    <div class="form-group">
+                        <label class="form-label">Service Name</label>
+                        <input type="text" class="form-input" id="editServiceName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Account/Email</label>
+                        <input type="text" class="form-input" id="editAccountName" required>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="app.closeModal('editCodeModal')">Cancel</button>
