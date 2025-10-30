@@ -25,11 +25,28 @@
             --text-secondary: #cbd5e1;
             --text-tertiary: #94a3b8;
             --border: #475569;
-            --error: #ef4444;
+            --error: #f97316;
             --warning: #f59e0b;
             --success: #10b981;
             --radius: 12px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* <CHANGE> Light mode theme variables */
+        html.light-mode {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #d1fae5;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-tertiary: #64748b;
+            --border: #cbd5e1;
+            --error: #f97316;
+            --warning: #f59e0b;
+            --success: #059669;
         }
 
         html, body {
@@ -39,6 +56,7 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         body {
@@ -90,6 +108,36 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.625rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
         }
 
         /* Main Content */
@@ -163,7 +211,7 @@
         }
 
         .btn-danger:hover {
-            background: #dc2626;
+            background: #ea580c;
         }
 
         .btn-small {
@@ -193,116 +241,6 @@
         .card:hover {
             border-color: var(--primary);
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            gap: 1rem;
-        }
-
-        .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .card-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        /* OTP Code Display */
-        .otp-code {
-            font-family: 'Courier New', monospace;
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: 0.25em;
-            color: var(--primary);
-            user-select: all;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 1rem;
-            background: rgba(16, 185, 129, 0.05);
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .otp-code:hover {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--primary);
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background: var(--bg-tertiary);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 2px;
-            transition: width 0.1s linear;
-        }
-
-        .progress-text {
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            min-width: 30px;
-            text-align: right;
-        }
-
-        /* Form Elements */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .form-input, .form-select, .form-textarea {
-            padding: 0.75rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.75rem;
         }
 
         /* Modal */
@@ -337,7 +275,7 @@
             animation: slideUp 0.3s ease-out;
         }
 
-        .modal .modal-body{
+        .modal .modal-body {
             max-height: calc(100vh - 300px);
             overflow-y: auto;
             padding-right: 10px;
@@ -422,7 +360,7 @@
         }
 
         .alert-error {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(249, 115, 22, 0.1);
             border: 1px solid var(--error);
             color: var(--error);
         }
@@ -464,18 +402,13 @@
         }
 
         /* OTP List */
-        .otp-list {
-            display: grid;
-            gap: 1rem;
-        }
-
         div#otpContainer {
             display: grid;
             gap: 20px;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         }
 
-        @media (max-width: 500px){
+        @media (max-width: 500px) {
             div#otpContainer {
                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             }
@@ -502,6 +435,25 @@
             justify-content: space-between;
             align-items: flex-start;
             gap: 1rem;
+        }
+
+        .otp-item-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .otp-item-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .otp-item-info {
@@ -544,6 +496,90 @@
         .otp-item-code:hover {
             background: rgba(16, 185, 129, 0.1);
             border-color: var(--primary);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 2px;
+            transition: width 0.1s linear, background 0.3s ease;
+        }
+
+        /* <CHANGE> Progress bar color changes based on time remaining */
+        .progress-fill.warning {
+            background: linear-gradient(90deg, var(--warning), #f59e0b);
+        }
+
+        .progress-fill.critical {
+            background: linear-gradient(90deg, var(--error), #ea580c);
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            min-width: 30px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Form Elements */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
 
         /* PIN Screen */
@@ -654,6 +690,13 @@
         @media (max-width: 768px) {
             .header {
                 padding: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .search-container {
+                max-width: 100%;
+                order: 3;
+                flex-basis: 100%;
             }
 
             .main-content {
@@ -664,10 +707,6 @@
                 padding: 1.5rem;
             }
 
-            .otp-code {
-                font-size: 1.5rem;
-            }
-
             .otp-item-code {
                 font-size: 1.25rem;
             }
@@ -676,6 +715,10 @@
                 width: 45px;
                 height: 45px;
                 font-size: 1.25rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -688,64 +731,64 @@
             text-align: center;
         }
 
-        .mt-1 { margin-top: 0.5rem; }
-        .mt-2 { margin-top: 1rem; }
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-
-        .flex {
-            display: flex;
-        }
-
-        .flex-col {
-            flex-direction: column;
-        }
-
-        .gap-1 {
-            gap: 0.5rem;
-        }
-
-        .gap-2 {
-            gap: 1rem;
-        }
-
-        .items-center {
-            align-items: center;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .justify-center {
-            justify-content: center;
-        }
-
-        input::placeholder{
+        input::placeholder {
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* scroll bar */
+        html.light-mode input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
 
-        /* width */
+        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
 
-        /* Track */
         ::-webkit-scrollbar-track {
             background: var(--bg-secondary);
         }
 
-        /* Handle */
         ::-webkit-scrollbar-thumb {
             background: var(--primary);
         }
 
-        /* Handle on hover */
         ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            background: var(--primary-dark);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+
+        .theme-toggle button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .theme-toggle button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-toggle button:hover {
+            background: var(--border);
         }
     </style>
 </head>
@@ -775,7 +818,14 @@
                 <div class="header-icon">2FA</div>
                 <span>My2FA</span>
             </div>
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search codes..." onkeyup="app.filterCodes()">
+            </div>
             <div class="header-actions">
+                <div class="theme-toggle">
+                    <button id="darkModeBtn" class="active" onclick="app.setTheme('dark')" title="Dark Mode">🌙</button>
+                    <button id="lightModeBtn" onclick="app.setTheme('light')" title="Light Mode">☀️</button>
+                </div>
                 <button class="btn btn-icon btn-secondary" onclick="app.openSettings()" title="Settings">⚙️</button>
                 <button class="btn btn-icon btn-secondary" onclick="app.openAddCode()" title="Add Code">➕</button>
             </div>
@@ -810,25 +860,28 @@
                         <input type="text" class="form-input" id="secretKey" placeholder="Paste your secret key here" required>
                         <small style="color: var(--text-tertiary); margin-top: 0.25rem;">Usually found in QR code settings</small>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Algorithm</label>
-                        <select class="form-select" id="algorithm">
-                            <option value="SHA1">SHA1 (Default)</option>
-                            <option value="SHA256">SHA256</option>
-                            <option value="SHA512">SHA512</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Digits</label>
-                        <select class="form-select" id="digits">
-                            <option value="6">6 digits</option>
-                            <option value="7">7 digits</option>
-                            <option value="8">8 digits</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Algorithm</label>
+                            <select class="form-select" id="algorithm">
+                                <option value="SHA1">SHA1 (Default)</option>
+                                <option value="SHA256">SHA256</option>
+                                <option value="SHA512">SHA512</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Code Length</label>
+                            <select class="form-select" id="digits">
+                                <option value="6">6 digits</option>
+                                <option value="7">7 digits</option>
+                                <option value="8">8 digits</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Time Step (seconds)</label>
-                        <input type="number" class="form-input" id="timeStep" value="30" min="1">
+                        <input type="number" class="form-input" id="timeStep" value="30" min="1" max="60">
+                        <small style="color: var(--text-tertiary); margin-top: 0.25rem;">How often the code refreshes (usually 30s)</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -915,6 +968,24 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteConfirmModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Delete Code?</div>
+                <button class="modal-close" onclick="app.closeModal('deleteConfirmModal')">✕</button>
+            </div>
+            <div style="padding: 1rem 0;">
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Are you sure you want to delete this code? This action cannot be undone.</p>
+                <p id="deleteCodeName" style="font-weight: 600; color: var(--text-primary);"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeModal('deleteConfirmModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="app.confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="importFile" accept=".json" style="display: none;">
 
     <script>
@@ -990,15 +1061,18 @@
         // ============================================
         const app = {
             codes: [],
+            filteredCodes: [],
             pinEnabled: false,
             pinHash: null,
             updateInterval: null,
             currentPin: '',
+            deleteCodeId: null,
 
             init() {
                 this.loadData();
                 this.setupServiceWorker();
                 this.checkPin();
+                this.loadTheme();
                 this.render();
                 this.startUpdates();
                 this.setupPinKeypad();
@@ -1118,9 +1192,40 @@
                 }
             },
 
+            /* <CHANGE> Theme management */
+            setTheme(theme) {
+                const html = document.documentElement;
+                if (theme === 'light') {
+                    html.classList.add('light-mode');
+                    document.getElementById('darkModeBtn').classList.remove('active');
+                    document.getElementById('lightModeBtn').classList.add('active');
+                } else {
+                    html.classList.remove('light-mode');
+                    document.getElementById('darkModeBtn').classList.add('active');
+                    document.getElementById('lightModeBtn').classList.remove('active');
+                }
+                localStorage.setItem('2fa_theme', theme);
+            },
+
+            loadTheme() {
+                const theme = localStorage.getItem('2fa_theme') || 'dark';
+                this.setTheme(theme);
+            },
+
+            /* <CHANGE> Search/filter functionality */
+            filterCodes() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                this.filteredCodes = this.codes.filter(code =>
+                    code.serviceName.toLowerCase().includes(searchTerm) ||
+                    code.accountName.toLowerCase().includes(searchTerm)
+                );
+                this.render();
+            },
+
             loadData() {
                 const data = localStorage.getItem('2fa_codes');
                 this.codes = data ? JSON.parse(data) : [];
+                this.filteredCodes = this.codes;
             },
 
             saveData() {
@@ -1141,6 +1246,11 @@
                     return;
                 }
 
+                if (timeStep < 1 || timeStep > 60) {
+                    this.showAlert('Time step must be between 1 and 60 seconds', 'error');
+                    return;
+                }
+
                 const code = {
                     id: Date.now().toString(),
                     serviceName,
@@ -1154,6 +1264,7 @@
 
                 this.codes.push(code);
                 this.saveData();
+                this.filteredCodes = this.codes;
                 this.closeModal('addCodeModal');
                 this.render();
                 this.showAlert(`${serviceName} added successfully`, 'success');
@@ -1171,18 +1282,32 @@
                     code.serviceName = serviceName;
                     code.accountName = accountName;
                     this.saveData();
+                    this.filteredCodes = this.codes;
                     this.closeModal('editCodeModal');
                     this.render();
                     this.showAlert('Code updated successfully', 'success');
                 }
             },
 
+            /* <CHANGE> Improved delete with confirmation modal */
             deleteCode(id) {
-                if (confirm('Delete this code?')) {
-                    this.codes = this.codes.filter(c => c.id !== id);
+                const code = this.codes.find(c => c.id === id);
+                if (code) {
+                    this.deleteCodeId = id;
+                    document.getElementById('deleteCodeName').textContent = `${code.serviceName} (${code.accountName})`;
+                    this.openModal('deleteConfirmModal');
+                }
+            },
+
+            confirmDelete() {
+                if (this.deleteCodeId) {
+                    this.codes = this.codes.filter(c => c.id !== this.deleteCodeId);
                     this.saveData();
+                    this.filteredCodes = this.codes;
+                    this.closeModal('deleteConfirmModal');
                     this.render();
                     this.showAlert('Code deleted', 'success');
+                    this.deleteCodeId = null;
                 }
             },
 
@@ -1227,6 +1352,7 @@
                     if (confirm(`Import ${backup.codes.length} codes? This will merge with existing codes.`)) {
                         this.codes = [...this.codes, ...backup.codes];
                         this.saveData();
+                        this.filteredCodes = this.codes;
                         this.closeModal('importModal');
                         this.render();
                         this.showAlert('Backup imported successfully', 'success');
@@ -1240,6 +1366,7 @@
                 if (confirm('Delete ALL codes? This cannot be undone!')) {
                     if (confirm('Are you absolutely sure?')) {
                         this.codes = [];
+                        this.filteredCodes = [];
                         this.saveData();
                         this.render();
                         this.showAlert('All data cleared', 'success');
@@ -1259,6 +1386,9 @@
                 document.getElementById('serviceName').value = '';
                 document.getElementById('accountName').value = '';
                 document.getElementById('secretKey').value = '';
+                document.getElementById('algorithm').value = 'SHA1';
+                document.getElementById('digits').value = '6';
+                document.getElementById('timeStep').value = '30';
                 this.openModal('addCodeModal');
             },
 
@@ -1278,22 +1408,37 @@
                 setTimeout(() => alert.remove(), 3000);
             },
 
+            /* <CHANGE> Get company logo from Clearbit API */
+            getCompanyLogo(serviceName) {
+                return `https://logo.clearbit.com/${serviceName.toLowerCase().replace(/\s+/g, '')}.com?size=48`;
+            },
+
             async render() {
                 const container = document.getElementById('otpContainer');
-                if (this.codes.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🔐</div>
-                            <div class="empty-state-title">No codes yet</div>
-                            <div class="empty-state-text">Add your first 2FA code to get started</div>
-                            <button class="btn btn-primary" onclick="app.openAddCode()">Add Code</button>
-                        </div>
-                    `;
+                if (this.filteredCodes.length === 0) {
+                    if (this.codes.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔐</div>
+                                <div class="empty-state-title">No codes yet</div>
+                                <div class="empty-state-text">Add your first 2FA code to get started</div>
+                                <button class="btn btn-primary" onclick="app.openAddCode()">Add Code</button>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <div class="empty-state-title">No codes found</div>
+                                <div class="empty-state-text">Try adjusting your search</div>
+                            </div>
+                        `;
+                    }
                     return;
                 }
 
                 container.innerHTML = '';
-                for (const code of this.codes) {
+                for (const code of this.filteredCodes) {
                     const { code: otpCode, timeRemaining } = await TOTP.generate(code.secretKey, {
                         algorithm: code.algorithm,
                         digits: code.digits,
@@ -1301,11 +1446,22 @@
                     });
 
                     const progress = ((code.timeStep - timeRemaining) / code.timeStep) * 100;
+                    
+                    /* <CHANGE> Color changes based on time remaining */
+                    let progressClass = '';
+                    if (timeRemaining <= 5) {
+                        progressClass = 'critical';
+                    } else if (timeRemaining <= 10) {
+                        progressClass = 'warning';
+                    }
 
                     const item = document.createElement('div');
                     item.className = 'otp-item';
                     item.innerHTML = `
                         <div class="otp-item-header">
+                            <div class="otp-item-logo">
+                                <img src="${this.getCompanyLogo(code.serviceName)}" alt="${code.serviceName}" onerror="this.parentElement.textContent='${code.serviceName.charAt(0).toUpperCase()}'">
+                            </div>
                             <div class="otp-item-info">
                                 <div class="otp-item-name">${this.escapeHtml(code.serviceName)}</div>
                                 <div class="otp-item-account">${this.escapeHtml(code.accountName)}</div>
@@ -1318,7 +1474,7 @@
                         <div class="otp-item-code" onclick="app.copyToClipboard('${otpCode}')" title="Click to copy">${otpCode}</div>
                         <div class="progress-container">
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
+                                <div class="progress-fill ${progressClass}" style="width: ${progress}%"></div>
                             </div>
                             <div class="progress-text">${timeRemaining}s</div>
                         </div>
@@ -1329,7 +1485,7 @@
 
             async startUpdates() {
                 if (this.updateInterval) clearInterval(this.updateInterval);
-                this.updateInterval = setInterval(() => this.render(), 1000);
+                this.updateInterval = setInterval(() => this.render(), 100);
             },
 
             copyToClipboard(text) {
