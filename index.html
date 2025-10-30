@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Secure 2FA Authenticator - Manage your two-factor authentication codes offline">
+    <title>2FA Authenticator</title>
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%222FA%20Authenticator%22,%22short_name%22:%222FA%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%230f172a%22,%22theme_color%22:%22%230f172a%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%2310b981' width='192' height='192'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>2FA</text></svg>%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22}]}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border: #475569;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--bg-primary);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-small {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* OTP Code Display */
+        .otp-code {
+            font-family: 'Courier New', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: var(--primary);
+            user-select: all;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .otp-code:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            min-width: 30px;
+            text-align: right;
+        }
+
+        /* Form Elements */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-text {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* OTP List */
+        .otp-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .otp-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .otp-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+
+        .otp-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .otp-item-info {
+            flex: 1;
+        }
+
+        .otp-item-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .otp-item-account {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .otp-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .otp-item-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--primary);
+            user-select: all;
+            cursor: pointer;
+            padding: 0.75rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: var(--transition);
+        }
+
+        .otp-item-code:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* PIN Screen */
+        .pin-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .pin-screen.active {
+            display: flex;
+        }
+
+        .pin-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .pin-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .pin-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .pin-input-group {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .pin-input {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pin-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .pin-input.filled {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .pin-key {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pin-key:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary);
+        }
+
+        .pin-key:active {
+            transform: scale(0.95);
+        }
+
+        .pin-key.delete {
+            grid-column: 3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .modal {
+                padding: 1.5rem;
+            }
+
+            .otp-code {
+                font-size: 1.5rem;
+            }
+
+            .otp-item-code {
+                font-size: 1.25rem;
+            }
+
+            .pin-input {
+                width: 45px;
+                height: 45px;
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-1 {
+            gap: 0.5rem;
+        }
+
+        .gap-2 {
+            gap: 1rem;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- PIN Screen -->
+        <div class="pin-screen" id="pinScreen">
+            <div class="pin-container">
+                <div>
+                    <div class="pin-title">🔐 Enter PIN</div>
+                    <div class="pin-subtitle">Secure your 2FA codes</div>
+                </div>
+                <div class="pin-input-group" id="pinInputGroup">
+                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric">
+                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric">
+                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric">
+                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric">
+                </div>
+                <div class="pin-keypad" id="pinKeypad"></div>
+                <button class="btn btn-secondary" onclick="app.skipPin()">Skip for now</button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <div class="header-icon">2FA</div>
+                <span>Authenticator</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-icon btn-secondary" onclick="app.openSettings()" title="Settings">⚙️</button>
+                <button class="btn btn-icon btn-secondary" onclick="app.openAddCode()" title="Add Code">➕</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div id="alertContainer"></div>
+            <div id="otpContainer"></div>
+        </div>
+    </div>
+
+    <!-- Add Code Modal -->
+    <div class="modal-overlay" id="addCodeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Add 2FA Code</div>
+                <button class="modal-close" onclick="app.closeModal('addCodeModal')">✕</button>
+            </div>
+            <form onsubmit="app.addCode(event)">
+                <div class="form-group">
+                    <label class="form-label">Service Name *</label>
+                    <input type="text" class="form-input" id="serviceName" placeholder="e.g., Gmail, GitHub" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account/Email *</label>
+                    <input type="text" class="form-input" id="accountName" placeholder="e.g., user@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Secret Key (Base32) *</label>
+                    <input type="text" class="form-input" id="secretKey" placeholder="Paste your secret key here" required>
+                    <small style="color: var(--text-tertiary); margin-top: 0.25rem;">Usually found in QR code settings</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Algorithm</label>
+                    <select class="form-select" id="algorithm">
+                        <option value="SHA1">SHA1 (Default)</option>
+                        <option value="SHA256">SHA256</option>
+                        <option value="SHA512">SHA512</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Digits</label>
+                    <select class="form-select" id="digits">
+                        <option value="6">6 digits</option>
+                        <option value="7">7 digits</option>
+                        <option value="8">8 digits</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Time Step (seconds)</label>
+                    <input type="number" class="form-input" id="timeStep" value="30" min="1">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('addCodeModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Code</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Settings</div>
+                <button class="modal-close" onclick="app.closeModal('settingsModal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">PIN Protection</label>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="app.setupPin()" style="flex: 1;">Setup PIN</button>
+                    <button class="btn btn-danger" onclick="app.removePin()" style="flex: 1;">Remove PIN</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Backup & Restore</label>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-direction: column;">
+                    <button class="btn btn-secondary" onclick="app.exportBackup()" style="width: 100%;">📥 Export Backup</button>
+                    <button class="btn btn-secondary" onclick="app.importBackup()" style="width: 100%;">📤 Import Backup</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Danger Zone</label>
+                <button class="btn btn-danger" onclick="app.clearAll()" style="width: 100%; margin-top: 0.5rem;">🗑️ Clear All Data</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="app.closeModal('settingsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Backup Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Import Backup</div>
+                <button class="modal-close" onclick="app.closeModal('importModal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Paste Backup Data</label>
+                <textarea class="form-textarea" id="importData" placeholder="Paste your backup JSON here"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeModal('importModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="app.confirmImport()">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Code Modal -->
+    <div class="modal-overlay" id="editCodeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Edit Code</div>
+                <button class="modal-close" onclick="app.closeModal('editCodeModal')">✕</button>
+            </div>
+            <form onsubmit="app.updateCode(event)">
+                <input type="hidden" id="editCodeId">
+                <div class="form-group">
+                    <label class="form-label">Service Name</label>
+                    <input type="text" class="form-input" id="editServiceName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account/Email</label>
+                    <input type="text" class="form-input" id="editAccountName" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('editCodeModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;">
+
+    <script>
+        // ============================================
+        // TOTP Implementation
+        // ============================================
+        class TOTP {
+            static base32Decode(str) {
+                const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                let bits = '';
+                for (let i = 0; i < str.length; i++) {
+                    const val = alphabet.indexOf(str[i].toUpperCase());
+                    if (val === -1) throw new Error('Invalid base32 character');
+                    bits += val.toString(2).padStart(5, '0');
+                }
+                const bytes = [];
+                for (let i = 0; i + 8 <= bits.length; i += 8) {
+                    bytes.push(parseInt(bits.substr(i, 8), 2));
+                }
+                return new Uint8Array(bytes);
+            }
+
+            static async hmac(algorithm, key, message) {
+                const algoMap = {
+                    'SHA1': 'SHA-1',
+                    'SHA256': 'SHA-256',
+                    'SHA512': 'SHA-512'
+                };
+                const cryptoAlgo = algoMap[algorithm] || 'SHA-1';
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    key,
+                    { name: 'HMAC', hash: cryptoAlgo },
+                    false,
+                    ['sign']
+                );
+                return new Uint8Array(await crypto.subtle.sign('HMAC', cryptoKey, message));
+            }
+
+            static dynamicTruncate(hmac, digits) {
+                const offset = hmac[hmac.length - 1] & 0xf;
+                const p = hmac.slice(offset, offset + 4);
+                const num = ((p[0] & 0x7f) << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+                return (num % Math.pow(10, digits)).toString().padStart(digits, '0');
+            }
+
+            static async generate(secret, options = {}) {
+                const {
+                    algorithm = 'SHA1',
+                    digits = 6,
+                    timeStep = 30
+                } = options;
+
+                try {
+                    const key = this.base32Decode(secret);
+                    const time = Math.floor(Date.now() / 1000 / timeStep);
+                    const timeBuffer = new ArrayBuffer(8);
+                    const view = new DataView(timeBuffer);
+                    view.setBigInt64(0, BigInt(time), false);
+                    const hmacResult = await this.hmac(algorithm, key, new Uint8Array(timeBuffer));
+                    const code = this.dynamicTruncate(hmacResult, digits);
+                    const timeRemaining = timeStep - (Math.floor(Date.now() / 1000) % timeStep);
+                    return { code, timeRemaining };
+                } catch (error) {
+                    console.error('TOTP generation error:', error);
+                    return { code: 'ERROR', timeRemaining: 0 };
+                }
+            }
+        }
+
+        // ============================================
+        // Main App
+        // ============================================
+        const app = {
+            codes: [],
+            pinEnabled: false,
+            pinHash: null,
+            updateInterval: null,
+            currentPin: '',
+
+            init() {
+                this.loadData();
+                this.setupServiceWorker();
+                this.checkPin();
+                this.render();
+                this.startUpdates();
+                this.setupPinKeypad();
+            },
+
+            setupServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    const swCode = `
+                        self.addEventListener('install', e => self.skipWaiting());
+                        self.addEventListener('activate', e => self.clients.claim());
+                        self.addEventListener('fetch', e => {
+                            if (e.request.method === 'GET') {
+                                e.respondWith(
+                                    caches.match(e.request).then(r => r || fetch(e.request))
+                                );
+                            }
+                        });
+                    `;
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    navigator.serviceWorker.register(swUrl).catch(() => {});
+                }
+            },
+
+            setupPinKeypad() {
+                const keypad = document.getElementById('pinKeypad');
+                const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
+                keys.forEach(key => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'pin-key' + (key === '⌫' ? ' delete' : '');
+                    btn.textContent = key;
+                    if (key === '') btn.style.visibility = 'hidden';
+                    btn.onclick = () => this.handlePinKey(key);
+                    keypad.appendChild(btn);
+                });
+            },
+
+            handlePinKey(key) {
+                const inputs = document.querySelectorAll('#pinInputGroup .pin-input');
+                if (key === '⌫') {
+                    this.currentPin = this.currentPin.slice(0, -1);
+                } else if (this.currentPin.length < 4) {
+                    this.currentPin += key;
+                }
+                inputs.forEach((input, i) => {
+                    input.value = this.currentPin[i] || '';
+                    input.classList.toggle('filled', !!input.value);
+                });
+                if (this.currentPin.length === 4) {
+                    setTimeout(() => this.verifyPin(), 100);
+                }
+            },
+
+            checkPin() {
+                this.pinEnabled = localStorage.getItem('2fa_pin_enabled') === 'true';
+                this.pinHash = localStorage.getItem('2fa_pin_hash');
+                if (this.pinEnabled && this.pinHash) {
+                    document.getElementById('pinScreen').classList.add('active');
+                }
+            },
+
+            async verifyPin() {
+                const hash = await this.hashPin(this.currentPin);
+                if (hash === this.pinHash) {
+                    document.getElementById('pinScreen').classList.remove('active');
+                    this.currentPin = '';
+                    this.showAlert('PIN verified successfully', 'success');
+                } else {
+                    this.currentPin = '';
+                    document.querySelectorAll('#pinInputGroup .pin-input').forEach(input => {
+                        input.value = '';
+                        input.classList.remove('filled');
+                    });
+                    this.showAlert('Incorrect PIN', 'error');
+                }
+            },
+
+            skipPin() {
+                document.getElementById('pinScreen').classList.remove('active');
+            },
+
+            async hashPin(pin) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(pin);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+            },
+
+            setupPin() {
+                const pin = prompt('Enter a 4-digit PIN:');
+                if (!pin || pin.length !== 4 || !/^\d+$/.test(pin)) {
+                    this.showAlert('PIN must be 4 digits', 'error');
+                    return;
+                }
+                const confirmPin = prompt('Confirm PIN:');
+                if (pin !== confirmPin) {
+                    this.showAlert('PINs do not match', 'error');
+                    return;
+                }
+                this.hashPin(pin).then(hash => {
+                    localStorage.setItem('2fa_pin_enabled', 'true');
+                    localStorage.setItem('2fa_pin_hash', hash);
+                    this.pinEnabled = true;
+                    this.pinHash = hash;
+                    this.showAlert('PIN set successfully', 'success');
+                });
+            },
+
+            removePin() {
+                if (confirm('Remove PIN protection?')) {
+                    localStorage.removeItem('2fa_pin_enabled');
+                    localStorage.removeItem('2fa_pin_hash');
+                    this.pinEnabled = false;
+                    this.pinHash = null;
+                    this.showAlert('PIN removed', 'success');
+                }
+            },
+
+            loadData() {
+                const data = localStorage.getItem('2fa_codes');
+                this.codes = data ? JSON.parse(data) : [];
+            },
+
+            saveData() {
+                localStorage.setItem('2fa_codes', JSON.stringify(this.codes));
+            },
+
+            addCode(event) {
+                event.preventDefault();
+                const serviceName = document.getElementById('serviceName').value;
+                const accountName = document.getElementById('accountName').value;
+                const secretKey = document.getElementById('secretKey').value.toUpperCase().replace(/\s/g, '');
+                const algorithm = document.getElementById('algorithm').value;
+                const digits = parseInt(document.getElementById('digits').value);
+                const timeStep = parseInt(document.getElementById('timeStep').value);
+
+                if (!serviceName || !accountName || !secretKey) {
+                    this.showAlert('Please fill all required fields', 'error');
+                    return;
+                }
+
+                const code = {
+                    id: Date.now().toString(),
+                    serviceName,
+                    accountName,
+                    secretKey,
+                    algorithm,
+                    digits,
+                    timeStep,
+                    createdAt: new Date().toISOString()
+                };
+
+                this.codes.push(code);
+                this.saveData();
+                this.closeModal('addCodeModal');
+                this.render();
+                this.showAlert(`${serviceName} added successfully`, 'success');
+                event.target.reset();
+            },
+
+            updateCode(event) {
+                event.preventDefault();
+                const id = document.getElementById('editCodeId').value;
+                const serviceName = document.getElementById('editServiceName').value;
+                const accountName = document.getElementById('editAccountName').value;
+
+                const code = this.codes.find(c => c.id === id);
+                if (code) {
+                    code.serviceName = serviceName;
+                    code.accountName = accountName;
+                    this.saveData();
+                    this.closeModal('editCodeModal');
+                    this.render();
+                    this.showAlert('Code updated successfully', 'success');
+                }
+            },
+
+            deleteCode(id) {
+                if (confirm('Delete this code?')) {
+                    this.codes = this.codes.filter(c => c.id !== id);
+                    this.saveData();
+                    this.render();
+                    this.showAlert('Code deleted', 'success');
+                }
+            },
+
+            editCode(id) {
+                const code = this.codes.find(c => c.id === id);
+                if (code) {
+                    document.getElementById('editCodeId').value = id;
+                    document.getElementById('editServiceName').value = code.serviceName;
+                    document.getElementById('editAccountName').value = code.accountName;
+                    this.openModal('editCodeModal');
+                }
+            },
+
+            exportBackup() {
+                const backup = {
+                    version: 1,
+                    exportedAt: new Date().toISOString(),
+                    codes: this.codes
+                };
+                const json = JSON.stringify(backup, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `2fa-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                this.showAlert('Backup exported successfully', 'success');
+            },
+
+            importBackup() {
+                document.getElementById('importFile').click();
+            },
+
+            confirmImport() {
+                const data = document.getElementById('importData').value;
+                try {
+                    const backup = JSON.parse(data);
+                    if (!backup.codes || !Array.isArray(backup.codes)) {
+                        throw new Error('Invalid backup format');
+                    }
+                    if (confirm(`Import ${backup.codes.length} codes? This will merge with existing codes.`)) {
+                        this.codes = [...this.codes, ...backup.codes];
+                        this.saveData();
+                        this.closeModal('importModal');
+                        this.render();
+                        this.showAlert('Backup imported successfully', 'success');
+                    }
+                } catch (error) {
+                    this.showAlert('Invalid backup file: ' + error.message, 'error');
+                }
+            },
+
+            clearAll() {
+                if (confirm('Delete ALL codes? This cannot be undone!')) {
+                    if (confirm('Are you absolutely sure?')) {
+                        this.codes = [];
+                        this.saveData();
+                        this.render();
+                        this.showAlert('All data cleared', 'success');
+                    }
+                }
+            },
+
+            openModal(id) {
+                document.getElementById(id).classList.add('active');
+            },
+
+            closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+            },
+
+            openAddCode() {
+                document.getElementById('serviceName').value = '';
+                document.getElementById('accountName').value = '';
+                document.getElementById('secretKey').value = '';
+                this.openModal('addCodeModal');
+            },
+
+            openSettings() {
+                this.openModal('settingsModal');
+            },
+
+            showAlert(message, type = 'success') {
+                const container = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.innerHTML = `
+                    <span>${type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠'}</span>
+                    <span>${message}</span>
+                `;
+                container.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
+            },
+
+            async render() {
+                const container = document.getElementById('otpContainer');
+                if (this.codes.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔐</div>
+                            <div class="empty-state-title">No codes yet</div>
+                            <div class="empty-state-text">Add your first 2FA code to get started</div>
+                            <button class="btn btn-primary" onclick="app.openAddCode()">Add Code</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = '';
+                for (const code of this.codes) {
+                    const { code: otpCode, timeRemaining } = await TOTP.generate(code.secretKey, {
+                        algorithm: code.algorithm,
+                        digits: code.digits,
+                        timeStep: code.timeStep
+                    });
+
+                    const progress = ((code.timeStep - timeRemaining) / code.timeStep) * 100;
+
+                    const item = document.createElement('div');
+                    item.className = 'otp-item';
+                    item.innerHTML = `
+                        <div class="otp-item-header">
+                            <div class="otp-item-info">
+                                <div class="otp-item-name">${this.escapeHtml(code.serviceName)}</div>
+                                <div class="otp-item-account">${this.escapeHtml(code.accountName)}</div>
+                            </div>
+                            <div class="otp-item-actions">
+                                <button class="btn btn-icon btn-secondary btn-small" onclick="app.editCode('${code.id}')" title="Edit">✏️</button>
+                                <button class="btn btn-icon btn-danger btn-small" onclick="app.deleteCode('${code.id}')" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="otp-item-code" onclick="app.copyToClipboard('${otpCode}')" title="Click to copy">${otpCode}</div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="progress-text">${timeRemaining}s</div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                }
+            },
+
+            async startUpdates() {
+                if (this.updateInterval) clearInterval(this.updateInterval);
+                this.updateInterval = setInterval(() => this.render(), 1000);
+            },
+
+            copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showAlert('Code copied to clipboard', 'success');
+                }).catch(() => {
+                    this.showAlert('Failed to copy', 'error');
+                });
+            },
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        };
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle file import
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('importData').value = event.target.result;
+                    app.openModal('importModal');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Initialize app
+        window.addEventListener('load', () => app.init());
+    </script>
+</body>
+</html>
